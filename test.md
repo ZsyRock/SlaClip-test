@@ -28,4 +28,154 @@
 | Mean slack coord 4 | \(\frac{1}{5}\) | \(0.2000\) |
 
 
-html <h3>Toy example of Vanilla DP, SlaClip, and Adap-Clip (C = 1, K = 4, λ = 1/2)</h3> <table> <thead> <tr> <th>Step</th> <th>Vanilla DP toy gradient</th> <th>SlaClip toy gradient + indicator</th> <th>Adap-Clip toy gradient + extra query</th> </tr> </thead> <tbody> <tr> <td><b>1. Sorted toy batch</b></td> <td> g₁ = (2,0,0,0,0), ‖g₁‖ = 2<br> g₂ = (3/2,0,0,0,0), ‖g₂‖ = 3/2<br> g₃ = (1,0,0,0,0), ‖g₃‖ = 1<br> g₄ = (1/2,0,0,0,0), ‖g₄‖ = 1/2<br> g₅ = (0,0,0,0,0), ‖g₅‖ = 0 </td> <td> Same toy batch, with C = 1, K = 4, λ = 1/2. </td> <td> Same toy batch. A separate private query will later be used for the clipping statistic. </td> </tr> <tr> <td><b>2. Clip (C = 1)</b></td> <td> g₁ = (1,0,0,0,0)<br> g₂ = (1,0,0,0,0)<br> g₃ = (1,0,0,0,0)<br> g₄ = (1/2,0,0,0,0)<br> g₅ = (0,0,0,0,0) </td> <td> Same clipped gradients. </td> <td> Same clipped gradients. </td> </tr> <tr> <td><b>3. Slack encoding / extra-query step</b></td> <td> No extra coordinates. </td> <td> Slack values are δ = max(C − ‖g‖, 0):<br> δ₁ = 0, δ₂ = 0, δ₃ = 0, δ₄ = 1/2, δ₅ = 1.<br><br> Using K = 4 and λ = 1/2, the ordered slack vectors are:<br> s₁ = (0,0,0,0)<br> s₂ = (0,0,0,0)<br> s₃ = (0,0,0,0)<br> s₄ = (1/2,1/2,0,0)<br> s₅ = (1/2,1/2,1/2,1/2)<br><br> Extended vectors:<br> e₁ = (1,0,0,0,0; 0,0,0,0)<br> e₂ = (1,0,0,0,0; 0,0,0,0)<br> e₃ = (1,0,0,0,0; 0,0,0,0)<br> e₄ = (1/2,0,0,0,0; 1/2,1/2,0,0)<br> e₅ = (0,0,0,0,0; 1/2,1/2,1/2,1/2) </td> <td> Keep the clipped gradients, and issue a separate private query for the clipping statistic:<br> qₜ = (1/5) Σ 1[‖gᵢ‖ &lt; C] = 2/5. </td> </tr> <tr> <td><b>4. Aggregate (before noise)</b></td> <td> ḡ = (1/5) Σ Clip(gᵢ)<br> = ((1 + 1 + 1 + 1/2 + 0)/5, 0,0,0,0)<br> = (7/10, 0,0,0,0) </td> <td> ē = (1/5) Σ eᵢ<br> = (7/10, 0,0,0,0; 1/5, 1/5, 1/10, 1/10) </td> <td> Gradient mean is the same as Vanilla DP:<br> ḡ = (7/10, 0,0,0,0)<br> together with the extra query qₜ = 2/5. </td> </tr> <tr> <td><b>5. Add Gaussian noise</b></td> <td> Release: g̃ = ḡ + z<sub>g</sub> </td> <td> Release: ẽ = ē + z<br> (same Gaussian query on the extended vector) </td> <td> Release: g̃ = ḡ + z<sub>g</sub><br> and separately q̃ₜ = qₜ + z<sub>q</sub> </td> </tr> <tr> <td><b>6. Normalize extra coordinates<br>(for illustration, before noise)</b></td> <td> — </td> <td> Slack part of ē = (1/5, 1/5, 1/10, 1/10)<br> Divide by λ = 1/2:<br> ŝ = (2/5, 2/5, 1/5, 1/5) </td> <td> Extra private statistic:<br> qₜ = 2/5 </td> </tr> <tr> <td><b>7. Adaptive clipping update</b></td> <td> No adaptive clipping signal. </td> <td> The released cumulative signal near C is still relatively small.<br> If the target unclipped ratio is 1/2 but the current signal is below that target,<br> then increase C at the next step. </td> <td> Since qₜ = 2/5 &lt; 1/2, the extra query also indicates that the current threshold is too small,<br> so C should be increased. </td> </tr> </tbody> </table>
+<h3>Toy example of Vanilla DP, SlaClip, and Adap-Clip (C = 3/2, K = 4, λ = 3/4)</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Vanilla DP toy gradient</th>
+      <th>SlaClip toy gradient + indicator</th>
+      <th>Adap-Clip toy gradient + extra query</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>1. Sorted toy batch</b></td>
+      <td>
+        g₁ = (1/2,0,0,0,0), ‖g₁‖ = 1/2<br>
+        g₂ = (1,1/2,0,0,0), ‖g₂‖ = √5/2<br>
+        g₃ = (1,1,1/2,0,0), ‖g₃‖ = 3/2<br>
+        g₄ = (1,1,1,1/2,0), ‖g₄‖ = √13/2<br>
+        g₅ = (1,1,1,1,1/2), ‖g₅‖ = √17/2
+      </td>
+      <td>
+        Same toy batch, with C = 3/2, K = 4, λ = 3/4.
+      </td>
+      <td>
+        Same toy batch. A separate private query will later be used for the clipping statistic.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>2. Clip at C = 3/2</b></td>
+      <td>
+        g₁ = (1/2,0,0,0,0)<br>
+        g₂ = (1,1/2,0,0,0)<br>
+        g₃ = (1,1,1/2,0,0)<br>
+        g₄ = (3/√13, 3/√13, 3/√13, 3/(2√13), 0)<br>
+        g₅ = (3/√17, 3/√17, 3/√17, 3/√17, 3/(2√17))
+      </td>
+      <td>
+        Same clipped gradients.
+      </td>
+      <td>
+        Same clipped gradients.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>3. Slack encoding / extra-query step</b></td>
+      <td>
+        No extra coordinates.
+      </td>
+      <td>
+        Slack values are δ = max(C − ‖g‖, 0):<br>
+        δ₁ = 1<br>
+        δ₂ = (3 − √5)/2<br>
+        δ₃ = 0<br>
+        δ₄ = 0<br>
+        δ₅ = 0<br><br>
+
+        Using K = 4 and λ = 3/4, the ordered slack vectors are:<br>
+        s₁ = (3/4, 1/4, 0, 0)<br>
+        s₂ = ((3 − √5)/2, 0, 0, 0)<br>
+        s₃ = (0, 0, 0, 0)<br>
+        s₄ = (0, 0, 0, 0)<br>
+        s₅ = (0, 0, 0, 0)<br><br>
+
+        Extended vectors:<br>
+        e₁ = (1/2,0,0,0,0; 3/4,1/4,0,0)<br>
+        e₂ = (1,1/2,0,0,0; (3−√5)/2,0,0,0)<br>
+        e₃ = (1,1,1/2,0,0; 0,0,0,0)<br>
+        e₄ = (3/√13, 3/√13, 3/√13, 3/(2√13), 0; 0,0,0,0)<br>
+        e₅ = (3/√17, 3/√17, 3/√17, 3/√17, 3/(2√17); 0,0,0,0)
+      </td>
+      <td>
+        Keep the clipped gradients, and issue a separate private query for the clipping statistic.<br>
+        For example, the unclipped fraction can be queried separately.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>4. Aggregate (before noise)</b></td>
+      <td>
+        ḡ = (1/5) Σ Clip(gᵢ)<br>
+        = ( (3/2 + 3/√13 + 3/√17)/5,<br>
+        &nbsp;&nbsp;(3/2 + 3/√13 + 3/√17)/5,<br>
+        &nbsp;&nbsp;(1/2 + 3/√13 + 3/√17)/5,<br>
+        &nbsp;&nbsp;(3/(2√13) + 3/√17)/5,<br>
+        &nbsp;&nbsp;3/(10√17) )
+      </td>
+      <td>
+        ē = (1/5) Σ eᵢ<br>
+        = ( (3/2 + 3/√13 + 3/√17)/5,<br>
+        &nbsp;&nbsp;(3/2 + 3/√13 + 3/√17)/5,<br>
+        &nbsp;&nbsp;(1/2 + 3/√13 + 3/√17)/5,<br>
+        &nbsp;&nbsp;(3/(2√13) + 3/√17)/5,<br>
+        &nbsp;&nbsp;3/(10√17);<br>
+        &nbsp;&nbsp;9/20 − √5/10, 1/20, 0, 0 )
+      </td>
+      <td>
+        Gradient mean is the same as Vanilla DP,<br>
+        together with a separate private query for the clipping statistic.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>5. Add Gaussian noise</b></td>
+      <td>
+        Release: g̃ = ḡ + z<sub>g</sub>
+      </td>
+      <td>
+        Release: ẽ = ē + z<br>
+        (same Gaussian query on the extended vector)
+      </td>
+      <td>
+        Release: g̃ = ḡ + z<sub>g</sub><br>
+        and separately q̃ = q + z<sub>q</sub>
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>6. Normalize extra coordinates<br>(for illustration, before noise)</b></td>
+      <td>
+        —
+      </td>
+      <td>
+        Slack part of ē = (9/20 − √5/10, 1/20, 0, 0)<br>
+        Divide by λ = 3/4:<br>
+        ŝ = (3/5 − 2√5/15, 1/15, 0, 0)
+      </td>
+      <td>
+        The extra query statistic is released separately.
+      </td>
+    </tr>
+
+    <tr>
+      <td><b>7. Adaptive clipping update</b></td>
+      <td>
+        No adaptive clipping signal.
+      </td>
+      <td>
+        The released cumulative signal can be plugged into Eq. (13)<br>
+        to determine whether the current threshold C is too small or too large,<br>
+        and then update C for the next step.
+      </td>
+      <td>
+        The separate private query can also be used to update C,<br>
+        but it requires an additional private release.
+      </td>
+    </tr>
+  </tbody>
+</table>
