@@ -14,3 +14,15 @@
 | 3 | \(0\) | \((0,0,0,0)\) | \((\sqrt2,\sqrt2,0,0,0;\ 0,0,0,0)\) |
 | 4 | \(0\) | \((0,0,0,0)\) | \((2,0,0,0,0;\ 0,0,0,0)\) |
 | 5 | \(2\) | \((1,1,1,1)\) | \((0,0,0,0,0;\ 1,1,1,1)\) |
+
+| Aggregated quantity | Exact value | Decimal approximation |
+|---|---|---|
+| Mean clipped gradient (dim 1) | \(\frac{1+\frac{2}{\sqrt3}+\sqrt2+2}{5}\) | \(1.1138\) |
+| Mean clipped gradient (dim 2) | \(\frac{1+\frac{2}{\sqrt3}+\sqrt2}{5}\) | \(0.7138\) |
+| Mean clipped gradient (dim 3) | \(\frac{1+\frac{2}{\sqrt3}}{5}\) | \(0.4309\) |
+| Mean clipped gradient (dim 4) | \(\frac{1}{5}\) | \(0.2000\) |
+| Mean clipped gradient (dim 5) | \(0\) | \(0.0000\) |
+| Mean slack coord 1 | \(\frac{1}{5}\) | \(0.2000\) |
+| Mean slack coord 2 | \(\frac{1}{5}\) | \(0.2000\) |
+| Mean slack coord 3 | \(\frac{1}{5}\) | \(0.2000\) |
+| Mean slack coord 4 | \(\frac{1}{5}\) | \(0.2000\) |
