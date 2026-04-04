@@ -32,7 +32,6 @@ html <h3>Toy pipeline example (C<sub>t</sub> = 5, K = 5)</h3> <p> Below is a toy
 
 
 html <h3>Toy pipeline example (C<sub>t</sub> = 5, K = 5)</h3>
-
 <p>
 Below is a toy step-by-step illustration of the full pipeline.
 The SlaClip column shows how the same Gaussian release can carry both the clipped gradient and a cumulative indicator,
@@ -136,19 +135,20 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
       <td>
         g<sub>avg</sub> = (4)<br>
         Release:<br>
-        g<sub>noise</sub> = (4.01)
+        g<sub>noise</sub> = (4) + N = (4.01)<br>
+        (Here we assume the noise adds 0.01 to each coordinate.)
       </td>
       <td>
-        g′<sub>avg</sub> = (4; <b>5/15, 4/15, 3/15, 2/15, 1/15</b>)<br>
+        g′<sub>avg</sub> = (4.00; <b>0.33, 0.27, 0.20, 0.13, 0.07</b>)<br>
         Release:<br>
-        g′<sub>noise</sub> = (4.01; <b>5/15, 4/15, 3/15, 2/15, 1/15</b>) + N′
+        g′<sub>noise</sub> = (4.01; <b>0.34, 0.28, 0.21, 0.14, 0.08</b>) + N′<br>
+        (Here we assume the noise adds 0.01 to each coordinate.)
       </td>
       <td>
-        Gradient release:<br>
-        g<sub>noise</sub> = g<sub>avg</sub> + z<sub>g</sub><br><br>
-        Separate private query for unclipped ratio:<br>
-        q = 5 / 15<br>
-        q<sub>tild</sub> = q + z<sub>q</sub>
+        g<sub>avg</sub> = (4)<br>
+        Release:<br>
+        g<sub>noise</sub> = (4) + N = (4.02)<br>
+        (Here, following the extra-query design of Adap-Clip, we assume the noise adds 0.02 to each coordinate to offset the extra privacy cost introduced by the additional query.)
       </td>
     </tr>
     <tr>
