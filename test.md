@@ -90,7 +90,6 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
         (In this toy example, the counter value is 5.)
       </td>
     </tr>
-
     <tr>
       <td><b>Step II: Per-sample l<sub>2</sub> clipping</b></td>
       <td>
@@ -132,7 +131,6 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
         The clipping statistic is not encoded into the same release; it will be queried separately.
       </td>
     </tr>
-
     <tr>
       <td><b>Step III: Aggregate, noise and release.</b></td>
       <td>
@@ -153,7 +151,6 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
         q<sub>tild</sub> = q + z<sub>q</sub>
       </td>
     </tr>
-
     <tr>
       <td><b>Step IV: Privacy accounting and model update.</b></td>
       <td>
