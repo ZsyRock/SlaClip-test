@@ -28,7 +28,7 @@
 | Mean slack coord 4 | \(\frac{1}{5}\) | \(0.2000\) |
 
 
-html <h3>Toy pipeline example (C<sub>t</sub> = 5, K = 5)</h3>
+<h3>Toy pipeline example (C<sub>t</sub> = 5, K = 5)</h3>
 
 <p>
 Below is a toy step-by-step illustration of the full pipeline.
