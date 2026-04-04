@@ -38,7 +38,6 @@ Below is a toy step-by-step illustration of the full pipeline.
 The SlaClip column shows how the same Gaussian release can carry both the clipped gradient and a cumulative indicator,
 whereas the Adap-Clip column uses a separate private query for the clipping statistic.
 </p>
-
 <table>
   <thead>
     <tr>
