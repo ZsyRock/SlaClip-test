@@ -32,13 +32,11 @@ html <h3>Toy pipeline example (C<sub>t</sub> = 5, K = 5)</h3> <p> Below is a toy
 
 
 html <h3>Toy pipeline example (C<sub>t</sub> = 5, K = 5)</h3>
-
 <p>
 Below is a toy step-by-step illustration of the full pipeline.
 The SlaClip column shows how the same Gaussian release can carry both the clipped gradient and a cumulative indicator,
 whereas the Adap-Clip column uses a separate private query for the clipping statistic.
 </p>
-
 <table>
   <thead>
     <tr>
@@ -91,7 +89,6 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
         (In this toy example, the counter value is 5.)
       </td>
     </tr>
-
     <tr>
       <td><b>Step II: Per-sample l<sub>2</sub> clipping — make all gradients have norm &le; C<sub>t</sub></b></td>
       <td>
@@ -133,7 +130,6 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
         The clipping statistic is not encoded into the same release; it will be queried separately.
       </td>
     </tr>
-
     <tr>
       <td><b>Step III: Aggregate, noise and release.</b><br>
         (Toy assumption: the added Gaussian noise contributes +0.01 to each released coordinate in Vanilla DP-SGD and SlaClip.)
@@ -155,7 +151,6 @@ whereas the Adap-Clip column uses a separate private query for the clipping stat
         (In this toy illustration, we use a larger toy noise level for Adap-Clip to reflect the extra private query. Schematically, under a matched total privacy budget, an extra private query generally requires a larger matched noise multiplier.)
       </td>
     </tr>
-
     <tr>
       <td><b>Step IV: Privacy accounting and model update.</b></td>
       <td>
